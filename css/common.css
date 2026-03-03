@@ -1,0 +1,48 @@
+section#famemo {
+    margin-bottom: 10px;
+}
+
+#famemo:not([populated]) .famemo-toggle:before {
+    content: "[✍️+] Add ";
+}
+#famemo[populated] .famemo-toggle:before {
+    content: "[✍️] ";
+}
+#famemo[populated] .famemo-container,
+.famemo-container[open] {
+    max-height: 100vh;
+}
+
+.famemo-toggle {
+    cursor: pointer;
+}
+.famemo-toggle:hover {
+    text-decoration: underline;
+}
+
+.famemo-container {
+    margin-top: 1em;
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height .33s;
+}
+
+#famemo textarea {
+    width: 100%;
+}
+
+.famemo-flex {display: flex}
+.famemo-flex > * {flex: 1}
+
+.famemo-text-center {text-align: center}
+.famemo-text-right {text-align: right}
+
+*[flash] {
+  opacity: 1;
+  animation: flashFade 2s ease-out forwards;
+}
+@keyframes flashFade {
+  0% {opacity: 1}
+  66% {opacity: 1}
+  100% {opacity: 0}
+}

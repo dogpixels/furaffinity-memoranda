@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "FurAffinity Memoranda",
+  "version": "1.0.0",
+  "description": "Keep tabs on artists on FurAffinity by adding private notes to Userpages. Remind yourself what you followed someone for or what you wanted to commission them.",
+  
+  "developer": {
+    "name": "Flam",
+    "url": "https://flam.dogpixels.net/"
+  },
+  
+  "icons": {
+    "32": "img/32.png",
+    "48": "img/48.png",
+    "64": "img/64.png",
+    "96": "img/96.png",
+    "128": "img/128.png",
+    "256": "img/256.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.furaffinity.net/user/*"],
+      "js": ["js/common.content+options.js", "js/userpage.content.js"],
+      "css": ["css/common.css"]
+    }
+  ],
+
+  "background": {
+    "scripts": ["js/background.js"]
+  },
+
+  "permissions": ["storage", "unlimitedStorage"],
+
+  "host_permissions": ["*://*.furaffinity.net/user/*"],
+
+  "options_ui": {
+    "page": "html/options.html",
+    "open_in_tab": true
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@dogpixels.furaffinity-memoranda"
+    }      
+  }
+}
