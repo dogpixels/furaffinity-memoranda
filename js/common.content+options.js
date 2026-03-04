@@ -1,7 +1,7 @@
 /**
  * @fileoverview FurAffinity Memoranda Background Script
  * @version 1.0
- * @author draconigen <draconigen@dogpixels.net>
+ * @author Flam <flam@dogpixels.net>
  * @license AGPL-3.0
  * Provided "as is", without warranty of any kind.
  * # no matter how much pressure you have, dolphins have more
@@ -15,17 +15,16 @@
  * @param {string} username specific username to load notes for
  */
 async function loadNote(username) {
-    const notes = await readNotes(username);
+    const payload = await readNotes(username);
+    // console.info(`[FA Memo][common.js] readNotes('${username}') result:`, payload);
     
-    // console.info(`[FA Memo][common.js] readNotes('${username}') result:`, notes);
-    
-    if (!Object.hasOwn(notes, username))
+    if (!Object.hasOwn(payload, username))
         return;
-
+    
     const famemo = document.getElementById('famemo');
     famemo.toggleAttribute('populated', true);
-    famemo.querySelector('textarea').value = notes[username];
-    famemo.querySelector('#famemo-charcount').innerText = notes[username].length;
+    famemo.querySelector('textarea').value = payload[username].text;
+    famemo.querySelector('#famemo-charcount').innerText = payload[username].text.length;
 }
 
 /**
@@ -46,23 +45,9 @@ function indicate(text) {
 }
 
 /**
- * Retrieve all known usernames for which notes are stored.
- * @returns an array of all known usernames
- * @example ['blotch', 'kenket', 'vinaru']
- */
-async function getUsernames() {
-    try {
-        return await browser.runtime.sendMessage({action: 'getUsernames'});
-    } catch(e) {
-        console.error('[FA Memo][common.js] Error communicating with background script during getUsernames():', e);
-        return {};
-    }
-}
-
-/**
  * Retrieve notes for a specific username or all notes at once.
  * @param {string|null} username username to retrieve notes for; null for all
- * @returns {object} dictionary {username: notes} for all requested usernames
+ * @returns {object} dictionary {username: {displayName: string, text: string}} for all requested usernames
  */
 async function readNotes(username = null) {
     try {
@@ -76,27 +61,15 @@ async function readNotes(username = null) {
 /**
  * Write notes to storage.
  * @param {string} username username these notes are about
- * @param {string} note notes about the previously provided username
+ * @param {string} displayName current displayName for this username
+ * @param {string} text text about the previously provided username
  * @returns {boolean} success indication
  */
-async function writeNote(username, note) {
+async function writeNote(username, displayName, text) {
     try {
-        return await browser.runtime.sendMessage({action: 'writeNote', username: username, note: note});
+        return await browser.runtime.sendMessage({action: 'writeNote', username: username, displayName: displayName, text: text});
     } catch(e) {
         console.error('[Fa Memo][common.js] Error communicating with background script during writeNote():', e);
-        return false;
-    }
-}
-
-/**
- * Open Options page (via openOptionsPage in background.js)
- * @returns {boolean} success indication
- */
-async function openOptionsPage() {
-    try {
-        return await browser.runtime.sendMessage({action: 'openOptionsPage'});
-    } catch(e) {
-        console.error('[Fa Memo][common.js] Error communicating with background script during openOptionsPage():', e);
         return false;
     }
 }

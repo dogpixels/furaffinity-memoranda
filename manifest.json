@@ -18,30 +18,30 @@
     "256": "img/256.png"
   },
 
+  "permissions": ["storage", "unlimitedStorage"],
+
+  "host_permissions": ["*://*.furaffinity.net/user/*"],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@dogpixels.furaffinity-memoranda"
+    }      
+  },
+  
+  "options_ui": {
+    "page": "html/options.html",
+    "open_in_tab": true
+  },
+
+  "background": {
+    "scripts": ["js/background.js"]
+  },
+
   "content_scripts": [
     {
       "matches": ["*://*.furaffinity.net/user/*"],
       "js": ["js/common.content+options.js", "js/userpage.content.js"],
       "css": ["css/common.css"]
     }
-  ],
-
-  "background": {
-    "scripts": ["js/background.js"]
-  },
-
-  "permissions": ["storage", "unlimitedStorage"],
-
-  "host_permissions": ["*://*.furaffinity.net/user/*"],
-
-  "options_ui": {
-    "page": "html/options.html",
-    "open_in_tab": true
-  },
-
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "@dogpixels.furaffinity-memoranda"
-    }      
-  }
+  ]
 }

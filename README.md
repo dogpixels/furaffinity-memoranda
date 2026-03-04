@@ -1,9 +1,19 @@
 # FurAffinity Memoranda
 Keep tabs on artists on FurAffinity by adding private notes to Userpages. Remind yourself what you followed someone for or what you wanted to commission them.
 
-Notes are stored on your computer and cannot be accessed by anyone else. They exist as long as the extension remains installed.
+Features:
+* Attach private notes to your favorite artists or nemeses.
+* Search your notes.
 
-![Example Userpage View](doc/img/classic-layout-content.png)
+> Beware: Notes are stored on your computer and cannot be accessed by anyone else. They exist as long as the extension remains installed. Uninstalling the extension evicts all data.
+
+A box gets added to each userpage:
+
+![Example Userpage View](doc/img/modern-layout-content.png)
+
+The options page lists all entries in one place and lets you search your notes:
+
+![Example Options View](doc/img/modern-layout-options.png)
 
 ## Requirements
 * Firefox 148+

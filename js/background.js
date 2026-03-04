@@ -1,7 +1,7 @@
 /**
  * @fileoverview FurAffinity Memoranda Background Script
  * @version 1.0
- * @author draconigen <draconigen@dogpixels.net>
+ * @author Flam <flam@dogpixels.net>
  * @license AGPL-3.0
  * Provided "as is", without warranty of any kind.
  * # think twice before engaging with a squamate
@@ -11,7 +11,7 @@
  * background.js scoped config
  */
 const config = {
-    debug: false,        // additional info and debug log output to background console
+    debug: true,        // additional info and debug log output to background console
     storageArea: 'local' // see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage#properties
 }
 
@@ -43,15 +43,6 @@ browser.runtime.onMessage.addListener(async (msg) => {
         return;
 
     switch (msg.action) {
-        case 'getUsernames':
-             try {
-                return await browser.storage[config.storageArea].getKeys();
-            } catch(e) {
-                console.error(e);
-                log('error', '[FA Memo][background.js] Failed to read keys (usernames) from storage.');
-                return {};
-            }
-
         case 'readNotes':
             try {
                 // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/StorageArea/getBytesInUse
@@ -64,9 +55,14 @@ browser.runtime.onMessage.addListener(async (msg) => {
             }
 
         case 'writeNote':
+            if (!msg.username) {
+                console.warn('[FA Memo][background.js] Received malformed writeNote() request, ignoring it:', msg);
+                return false;
+            }
+            
             try {
-                if (msg.note !== '')
-                    await browser.storage[config.storageArea].set({[msg.username]: msg.note});
+                if (msg.text !== '')
+                    await browser.storage[config.storageArea].set({[msg.username]: {displayName: msg.displayName, text: msg.text}});
                 else
                     await browser.storage[config.storageArea].remove(msg.username);
                 return true;
@@ -91,11 +87,12 @@ browser.runtime.onMessage.addListener(async (msg) => {
 /**
  * When user edits an entry, broadcast an update to all other tabs
  * with the same userpage open and the addon options page
+ * see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/onChanged
  */
-browser.storage.onChanged.addListener(async (event) => {
-    if (config.debug) console.info('[FA Memo][background/background.js] storage.onChanged fired:', event);
-    for (const username in event) {
-        if (!Object.hasOwn(event, username)) continue;
+browser.storage.onChanged.addListener(async (changes) => {
+    if (config.debug) console.info('[FA Memo][background/background.js] storage.onChanged fired:', changes);
+    for (const username in changes) {
+        if (!Object.hasOwn(changes, username)) continue;
 
         const tabs = await browser.tabs.query({url: [
             `*://*.furaffinity.net/user/${username}`,
@@ -104,14 +101,23 @@ browser.storage.onChanged.addListener(async (event) => {
         ]});
 
     tabs.forEach(async (tab) => {
-            // if the entry was deleted, event[username] will simply have only oldValue, but not newValue
-            if (!event[username].newValue)
-                event[username].newValue = '';
+            // if the entry was deleted, changes[username] will simply have only oldValue, but not newValue
+            if (!changes[username].newValue)
+                changes[username].newValue = {displayName: '', text: ''};
 
             try {
-                await browser.tabs.sendMessage(tab.id, {action: 'updateNote', username: username, note: event[username].newValue});
+                await browser.tabs.sendMessage(tab.id, {
+                    action: 'update',
+                    username: username,
+                    displayName: changes[username].newValue.displayName,
+                    text: changes[username].newValue.text
+                });
             } catch(e) {
-                console.warn(`[FA Memo][background/background.js] Failed to sendMessage(tab.id ${tab.id} (tab.url ${tab.url}), {action: 'updateNote', notes: '${event[username].newValue}'}). Reason:`, e);
+                console.warn(`[FA Memo][background/background.js] Failed to sendMessage(tab.id ${tab.id} (tab.url ${tab.url}), {
+                    action: 'update',
+                    displayName: '${changes[username].newValue.displayName}'
+                    text: '${changes[username].newValue.text}'
+                }). Reason:`, e);
             }
         });
     }
