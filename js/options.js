@@ -163,12 +163,13 @@ function createLi(username, displayName) {
  */
 function setCurrentUsername(username, displayName) {
     const cu = document.getElementById('currentUsername');
+    cu.innerText = '';
     cu.dataset.username = username;
     cu.dataset.displayName = displayName;
-    if (username.toLowerCase() === displayName.toLowerCase())
-        cu.innerHTML = `on <a href="https://furaffinity.net/user/${username}">${displayName}</a>`;
-    else
-        cu.innerHTML = `on <a href="https://furaffinity.net/user/${username}">${displayName} (~${username})</a>`;
+    const a = document.createElement('a');
+    cu.appendChild(a);
+    a.href = `https://furaffinity.net/user/${username}`;
+    a.innerText = username.toLowerCase() === displayName.toLowerCase()? `${displayName}` : `${displayName} (~${username})`;
 }
 
 /**
