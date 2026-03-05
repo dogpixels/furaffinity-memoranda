@@ -1,9 +1,10 @@
 # FurAffinity Memoranda
-Keep tabs on artists on FurAffinity by adding private notes to Userpages. Remind yourself what you followed someone for or what you wanted to commission them.
+Keep tabs on people on FurAffinity by attaching private notes to their Userpage. Write yourself reminders on why you followed someone, or what you wanted to commission them for.
 
 Features:
 * Attach private notes to your favorite artists or nemeses.
 * Search your notes.
+* Import & Export all your data for full control and easy migration.
 
 > Beware: Notes are stored on your computer and cannot be accessed by anyone else. They exist as long as the extension remains installed. Uninstalling the extension evicts all data.
 
