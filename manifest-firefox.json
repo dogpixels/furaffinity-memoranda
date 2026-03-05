@@ -24,7 +24,10 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "@dogpixels.furaffinity-memoranda"
+      "id": "@dogpixels.furaffinity-memoranda",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }      
   },
   
