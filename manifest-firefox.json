@@ -1,0 +1,47 @@
+{
+  "manifest_version": 3,
+  "name": "FurAffinity Memoranda",
+  "version": "1.0.0",
+  "description": "Add private memos to FA Userpages. Caution: Notes stored only as long as extension is installed.",
+  
+  "developer": {
+    "name": "Flam",
+    "url": "https://flam.dogpixels.net/"
+  },
+  
+  "icons": {
+    "32": "img/32.png",
+    "48": "img/48.png",
+    "64": "img/64.png",
+    "96": "img/96.png",
+    "128": "img/128.png",
+    "256": "img/256.png"
+  },
+
+  "permissions": ["tabs", "storage", "unlimitedStorage"],
+
+  "host_permissions": ["*://*.furaffinity.net/user/*"],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@dogpixels.furaffinity-memoranda"
+    }      
+  },
+  
+  "options_ui": {
+    "page": "html/options.html",
+    "open_in_tab": true
+  },
+
+  "background": {
+    "scripts": ["js/background.js"]
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.furaffinity.net/user/*"],
+      "js": ["js/common.content+options.js", "js/userpage.content.js"],
+      "css": ["css/common.css"]
+    }
+  ]
+}

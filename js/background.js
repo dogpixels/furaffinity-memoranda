@@ -8,10 +8,17 @@
  */
 
 /**
+ * Import Mozilla's WebExtensions Polyfill for Chrome compatibility
+ * see https://github.com/mozilla/webextension-polyfill
+ */
+if (typeof browser === "undefined") // true in Chrome, False in Firefox
+    importScripts("browser-polyfill.min.js");
+
+/**
  * background.js scoped config
  */
 const config = {
-    debug: true,        // additional info and debug log output to background console
+    debug: false,        // additional info and debug log output to background console
     storageArea: 'local' // see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage#properties
 }
 
@@ -95,10 +102,12 @@ browser.storage.onChanged.addListener(async (changes) => {
         if (!Object.hasOwn(changes, username)) continue;
 
         const tabs = await browser.tabs.query({url: [
-            `*://*.furaffinity.net/user/${username}`,
-            `*://*.furaffinity.net/user/${username}/`,
-            browser.runtime.getURL("html/options.html")
+            `*://*.furaffinity.net/user/${username}*`,
+            `${browser.runtime.getURL('html/options.html')}*`
         ]});
+
+
+    if (config.debug) console.info('[FA Memo][background.js] storage.onChanged transmitting update message to the following tabs:', tabs);
 
     tabs.forEach(async (tab) => {
             // if the entry was deleted, changes[username] will simply have only oldValue, but not newValue

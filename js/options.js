@@ -191,35 +191,18 @@ function getCurrentDisplayName() {
  * Danger Zone Logic
  */
 
-const api = globalThis.browser ?? globalThis.chrome;
-
 document.getElementById('deleteAll').addEventListener('click', async () => {
     if (window.confirm('Are you sure? This cannot be undone!')) {
-        await getStorage(config.storageArea).clear();
+        await browser.storage[config.storageArea].clear();
         
         if (config.debug) console.info('[FA Memo][options.js] All data cleared by user.');
         location.reload();
     }
-})
-
-function getStorage(area) {
-    if (!api.storage || !api.storage[area]) {
-        throw new Error('[FA Memo][options.js] getStorage() called with invalid storage area:', area);
-    }
-    return api.storage[area];
-}
+});
 
 document.getElementById('export').addEventListener('click', async () => {
     try {
-        const payload = await new Promise((resolve, reject) => {
-            getStorage(config.storageArea).get(null, result => {
-                if (api.runtime.lastError) {
-                    reject(api.runtime.lastError);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
+        const payload = await browser.storage[config.storageArea].get(null);
 
         // add some meta information
         payload.$product = 'furaffinity-memoranda';
@@ -255,11 +238,13 @@ document.getElementById('import').addEventListener('change', async (event) => {
 
         if (payload.$product !== 'furaffinity-memoranda'){
             console.error('[FA Memo][options.js] Import failed due to product mismatch:', {expected: 'furaffinity-memoranda', imported: payload.$product});
+            alert('Import failed: this file does not seem to come from FurAffinity Memoranda.');
             return;
         }
 
         if (payload.$version !== config.dbSchemaVersion) {
             console.error('[FA Memo][options.js] Import failed due to schema version mismatch:', {expected: 1, imported: payload.$version});
+            alert('Import failed: this file seems to originate from an older version of FurAffinity Memoranda and is not compatible. Please contact support for a solution.');
             return;
         }
 
@@ -267,15 +252,7 @@ document.getElementById('import').addEventListener('change', async (event) => {
         delete payload.$product;
         delete payload.$version;
 
-        await new Promise((resolve, reject) => {
-            getStorage(config.storageArea).set(payload, () => {
-                if (api.runtime.lastError) {
-                    reject(api.runtime.lastError);
-                } else {
-                    resolve();
-                }
-            });
-        });
+        await browser.storage[config.storageArea].set(payload);
 
         if (config.debug) console.info('[FA Memo][options.js] Import succeeded.');
         location.reload();

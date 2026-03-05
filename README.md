@@ -17,9 +17,11 @@ The options page lists all entries in one place and lets you search your notes:
 
 ## Requirements
 * Firefox 148+
+* Chrome 145+
 
 ## Installation
 * For Firefox, go to https://addons.mozilla.org/firefox/addon/furaffinity-memoranda/ and click "Add to Firefox".
+* For Chrome, go to ??? and click "Add to Chrome".
 
 ## Usage
 Visit any Userpage (e.g. [https://www.furaffinity.net/user/draconigen](https://www.furaffinity.net/user/draconigen)). A new section above the profile info should appear: click on `[✍️+] Add Private Memorandum` and start typing.
