@@ -45,7 +45,7 @@ const domReadyInterval = setInterval(async () => {
 
 // react on reply from background script
 browser.runtime.onMessage.addListener((msg) => {
-    console.debug('[FA Memo][userpage.content.js] message received:', msg);
+    // console.debug('[FA Memo][userpage.content.js] message received:', msg);
 
     if (!msg.action)
         return;

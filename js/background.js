@@ -28,7 +28,7 @@ async function log(level, message) {
         try {
             await browser.tabs.sendMessage(tab.id, {action: 'log', level: level, message: message});
         } catch(e) {
-            console.warn(`[FA Memo][background/background.js] Failed to sendMessage(tab.id ${tab.id} (tab.url ${tab.url}), {action: 'log', level: ${level}, message: ${message}}). Reason:`, e);
+            console.warn(`[FA Memo][background.js] Failed to sendMessage(tab.id ${tab.id} (tab.url ${tab.url}), {action: 'log', level: ${level}, message: ${message}}). Reason:`, e);
         }
     });
 }
@@ -37,7 +37,7 @@ async function log(level, message) {
  * Handle Messages from content script.
  */
 browser.runtime.onMessage.addListener(async (msg) => {
-    if (config.debug) console.info('[FA Memo][background/background.js] message received:', msg);
+    if (config.debug) console.info('[FA Memo][background.js] message received:', msg);
 
     if (!msg.action)
         return;
@@ -90,7 +90,7 @@ browser.runtime.onMessage.addListener(async (msg) => {
  * see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/onChanged
  */
 browser.storage.onChanged.addListener(async (changes) => {
-    if (config.debug) console.info('[FA Memo][background/background.js] storage.onChanged fired:', changes);
+    if (config.debug) console.info('[FA Memo][background.js] storage.onChanged fired:', changes);
     for (const username in changes) {
         if (!Object.hasOwn(changes, username)) continue;
 
@@ -113,7 +113,7 @@ browser.storage.onChanged.addListener(async (changes) => {
                     text: changes[username].newValue.text
                 });
             } catch(e) {
-                console.warn(`[FA Memo][background/background.js] Failed to sendMessage(tab.id ${tab.id} (tab.url ${tab.url}), {
+                console.warn(`[FA Memo][background.js] Failed to sendMessage(tab.id ${tab.id} (tab.url ${tab.url}), {
                     action: 'update',
                     displayName: '${changes[username].newValue.displayName}'
                     text: '${changes[username].newValue.text}'
