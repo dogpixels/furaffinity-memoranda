@@ -8,6 +8,15 @@
  */
 
 /**
+ * options.js scoped config
+ */
+const config = {
+    debug: false,         // additional info and debug log output to background console
+    storageArea: 'local', // see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage#properties
+    dbSchemaVersion: 1    // used for import/export compatibility checks
+}
+
+/**
  * @type {object} A {username:{displayName:string, text:string} copy of all data in storage.
  * Populated on <input id="search"> focus event for an up-to-date
  * representation of storage contents while optimizing storage read.
@@ -82,7 +91,7 @@ async function loadUsernamesForSearch(search) {
 
 // handle background script messages
 browser.runtime.onMessage.addListener((msg) => {
-    console.debug('[FA Memo][userpage.content.js] message received:', msg);
+    if (config.debug) console.debug('[FA Memo][options.js] message received:', msg);
 
     if (!msg.action)
         return;
@@ -177,3 +186,100 @@ function getCurrentUsername() {
 function getCurrentDisplayName() {
     return document.getElementById('currentUsername').dataset.displayName;
 }
+
+/**
+ * Danger Zone Logic
+ */
+
+const api = globalThis.browser ?? globalThis.chrome;
+
+document.getElementById('deleteAll').addEventListener('click', async () => {
+    if (window.confirm('Are you sure? This cannot be undone!')) {
+        await getStorage(config.storageArea).clear();
+        
+        if (config.debug) console.info('[FA Memo][options.js] All data cleared by user.');
+        location.reload();
+    }
+})
+
+function getStorage(area) {
+    if (!api.storage || !api.storage[area]) {
+        throw new Error('[FA Memo][options.js] getStorage() called with invalid storage area:', area);
+    }
+    return api.storage[area];
+}
+
+document.getElementById('export').addEventListener('click', async () => {
+    try {
+        const payload = await new Promise((resolve, reject) => {
+            getStorage(config.storageArea).get(null, result => {
+                if (api.runtime.lastError) {
+                    reject(api.runtime.lastError);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+
+        // add some meta information
+        payload.$product = 'furaffinity-memoranda';
+        payload.$version = config.dbSchemaVersion;
+
+        const json = JSON.stringify(payload, null, 3);
+        const blob = new Blob([json], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `furaffinity-memoranda-backup-${config.storageArea}-${timestamp}.json`;
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        console.error('[FA Memo][options.js] Export failed. Reason:', e);
+    }
+});
+
+document.getElementById('import').addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file)
+        return;
+
+    try {
+        const payload = JSON.parse(await file.text());
+
+        if (payload.$product !== 'furaffinity-memoranda'){
+            console.error('[FA Memo][options.js] Import failed due to product mismatch:', {expected: 'furaffinity-memoranda', imported: payload.$product});
+            return;
+        }
+
+        if (payload.$version !== config.dbSchemaVersion) {
+            console.error('[FA Memo][options.js] Import failed due to schema version mismatch:', {expected: 1, imported: payload.$version});
+            return;
+        }
+
+        // delete meta info as to not import them, too
+        delete payload.$product;
+        delete payload.$version;
+
+        await new Promise((resolve, reject) => {
+            getStorage(config.storageArea).set(payload, () => {
+                if (api.runtime.lastError) {
+                    reject(api.runtime.lastError);
+                } else {
+                    resolve();
+                }
+            });
+        });
+
+        if (config.debug) console.info('[FA Memo][options.js] Import succeeded.');
+        location.reload();
+    } catch (e) {
+        console.error('[FA Memo][options.js] Import failed. Reason:', e);
+    }
+});

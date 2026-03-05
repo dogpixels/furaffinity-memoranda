@@ -24,9 +24,10 @@
             main > section {
                 margin: 0 10px;
             }
-            a {
+            a, label[for="import"] {
                 color: rgba(255, 255, 255, 0.92);
                 text-decoration: underline dotted 1px;
+                cursor: pointer;
             }
             input, textarea, #usernames > li {
                 color: rgba(255, 255, 255, 0.92);
@@ -63,14 +64,19 @@
                 background-color: #4e5561;
             }
 
-            #indicator {
-                text-align: right;
-            }
             footer {
                 min-height: 24px;
                 width: 100%;
                 padding: 2px 20px;
-                background-color: rgba(0, 0, 0, 0.15);
+                background-color: #2d323a;
+            }
+            footer a#deleteAll {
+                color: orangered;
+            }
+            footer input[type="file"] {
+                position: fixed;
+                opacity: 0;
+                bottom: -100vh;
             }
         </style>
     </head>
@@ -92,8 +98,15 @@
             </section>
         </main>
 
-        <footer>
-            FurAffinity Memoranda | by <a href="https://www.furaffinity.net/user/draconigen">Flam</a> | not affiliated with FurAffinity
+        <footer class="flex">
+            <div>
+                FurAffinity Memoranda | by <a href="https://www.furaffinity.net/user/draconigen">Flam (~draconigen)</a> | Not Affiliated With FurAffinity Staff
+            </div>
+            <div class="famemo-text-right">
+                <a href="#" id="deleteAll">Delete All</a> |                
+                <label for="import">Import</label> <input type="file" id="import" accept="application/json" /> |
+                <a href="#" id="export">Export</a>
+            </div>
         </footer>
         <script src="../js/common.content+options.js"></script>
         <script src="../js/options.js"></script>
