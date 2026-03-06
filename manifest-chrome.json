@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "FurAffinity Memoranda",
-  "version": "1.0.0",
-  "description": "Add private memos to FA Userpages. Caution: Notes stored only as long as extension is installed.",
+  "version": "1.0.1",
+  "description": "Attach private notes to FurAffinity users. Keep tabs on why you followed someone or wanted to commission them for.",
   
   "author": "Flam <flam@dogpixels.net>",
   
